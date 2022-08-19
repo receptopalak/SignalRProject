@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using SignalRProject.Business;
 using SignalRProject.Hubs;
 using System;
 using System.Collections.Generic;
@@ -31,7 +32,9 @@ namespace SignalRProject
                                         .AllowCredentials()
                                         .SetIsOriginAllowed(origin => true)          // cors ayarlarý AddCors metodu ile yapýlýr. 
             ));
+            services.AddTransient<MyBusiness>();
             services.AddSignalR(); // SignalR sisteme eklenir. 
+            services.AddControllers();
 
         }
 
@@ -67,6 +70,7 @@ namespace SignalRProject
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapHub<MyHub>("/myhub"); // SignalR ile socket oluþturabilmesi için bir end point oluþturulur. 
+                endpoints.MapControllers(); 
             });
         }
     }

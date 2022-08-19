@@ -1,37 +1,30 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
-using SignalRProject.Models;
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
+using SignalRProject.Business;
+using SignalRProject.Hubs;
 using System.Threading.Tasks;
 
 namespace SignalRProject.Controllers
 {
-    public class HomeController : Controller
+    [Route("api/[controller]")]
+    [ApiController]
+    public class HomeController : ControllerBase
     {
-        private readonly ILogger<HomeController> _logger;
+        readonly MyBusiness _myBusiness;// Buradan mybusiness a dependecy enjeciton ile istenilen işlmler yapılabilir.
+        readonly IHubContext<MyHub> _hubContext; //  Buradan ise başka bir class a enjection yapmadan direk ıhıbcontexte dependecy injection yaparak istenlien işlemler yapılabilir. 
 
-        public HomeController(ILogger<HomeController> logger)
+        public HomeController(MyBusiness myBusiness, IHubContext<MyHub> hubContext)
         {
-            _logger = logger;
+            _myBusiness = myBusiness;
+            _hubContext = hubContext;
         }
 
-        public IActionResult Index()
+        [HttpGet("{message}")]
+        public async Task<IActionResult> Index(string message)
         {
-            return View();
-        }
-
-        public IActionResult Privacy()
-        {
-            return View();
-        }
-
-        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-        public IActionResult Error()
-        {
-            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+            _myBusiness.SendMessageAsync(message);
+            return Ok();
         }
     }
 }
